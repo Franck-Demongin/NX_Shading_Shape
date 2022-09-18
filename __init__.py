@@ -34,7 +34,7 @@ class Viewport_OT_shading_shape(bpy.types.Operator):
     
     def execute(self, context):
 
-        area = context.screen.areas[context.screen.area_idx]
+        area = context.screen.areas[context.screen.nx_shading_shape.area_idx]
         if area.type == 'VIEW_3D':
             space = area.spaces[0]
             context.screen.nx_shading_shape.shading_type = space.shading.type
@@ -67,9 +67,9 @@ class Viewport_OT_shading_shape(bpy.types.Operator):
         return {'FINISHED'}
     
     def reset_area(self, context):    
-        area = context.screen.areas[context.screen.area_idx]
+        area = context.screen.areas[context.screen.nx_shading_shape.area_idx]
 
-        if context.screen.area_type == 'VIEW_3D':
+        if context.screen.nx_shading_shape.area_type == 'VIEW_3D':
             space = area.spaces[0]
             space.shading.type = context.screen.nx_shading_shape.shading_type
             space.shading.light = context.screen.nx_shading_shape.shading_light
@@ -83,29 +83,28 @@ class Viewport_OT_shading_shape(bpy.types.Operator):
             space.show_gizmo = context.screen.nx_shading_shape.show_gizmo
             space.region_3d.view_perspective = context.screen.nx_shading_shape.view_perspective
 
-        area.type = context.screen.area_type
+
+        area.type = context.screen.nx_shading_shape.area_type
 
     
     def modal(self, context, event):
-        if context.screen.area_active:
-            context.screen.area_active = False
+        if context.screen.nx_shading_shape.area_active:
+            context.screen.nx_shading_shape.area_active = False
             self.reset_area(context)
             return {'FINISHED'}
+
         elif event.type == 'LEFTMOUSE' and event.value == 'RELEASE':
-            context.screen.area_active = True
+            context.screen.nx_shading_shape.area_active = True
             for idx, area in enumerate(context.screen.areas.items()):
-                if (
-                    event.mouse_x > area[1].x and 
-                    event.mouse_x < area[1].x + area[1].width and
-                    event.mouse_y > area[1].y and 
-                    event.mouse_y < area[1].y + area[1].height
-                ):
-                    context.screen.area_type = area[1].type
-                    context.screen.area_idx = idx
+                if (event.mouse_x > area[1].x and event.mouse_x < area[1].x + area[1].width and
+                    event.mouse_y > area[1].y and event.mouse_y < area[1].y + area[1].height):
+                    context.screen.nx_shading_shape.area_type = area[1].type
+                    context.screen.nx_shading_shape.area_idx = idx
                     break
 
             self.execute(context)            
             return {'FINISHED'}
+
         elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancel
             return {'CANCELLED'}
 
@@ -117,6 +116,9 @@ class Viewport_OT_shading_shape(bpy.types.Operator):
 
 
 class MyPropertyGroup(bpy.types.PropertyGroup):
+    area_type: bpy.props.StringProperty()
+    area_idx: bpy.props.IntProperty(default = -1)
+    area_active: bpy.props.BoolProperty(default = False)
     shading_type: bpy.props.StringProperty()
     shading_light: bpy.props.StringProperty()
     shading_single_color: bpy.props.FloatVectorProperty()
@@ -133,25 +135,20 @@ class MyPropertyGroup(bpy.types.PropertyGroup):
 bpy.utils.register_class(MyPropertyGroup)
 
 def menu_func(self, context):
-    self.layout.operator('viewport.shading_shape', text='Shading Shape', icon='SHAPEKEY_DATA')
+    label = 'Activate Shading shape'
+    if context.screen.nx_shading_shape.area_active:
+        label = 'Deactivate Shading shape'
+    self.layout.operator('viewport.shading_shape', text=label, icon='SHAPEKEY_DATA')
 
 def register():
     bpy.utils.register_class(Viewport_OT_shading_shape)
     bpy.types.VIEW3D_PT_shading.append(menu_func)
-
-    bpy.types.Screen.area_type = bpy.props.StringProperty(default = '')
-    bpy.types.Screen.area_idx = bpy.props.IntProperty(default = -1)
-    bpy.types.Screen.area_active = bpy.props.BoolProperty(default = False)
     bpy.types.Screen.nx_shading_shape = bpy.props.PointerProperty(type=MyPropertyGroup)
 
 
 def unregister():
     bpy.utils.unregister_class(Viewport_OT_shading_shape)
     bpy.types.VIEW3D_PT_shading.remove(menu_func)
-
-    del bpy.types.Screen.area_type
-    del bpy.types.Screen.area_idx
-    del bpy.types.Screen.area_active
     del bpy.types.Screen.nx_shading_shape
 
 if __name__ == "__main__":
