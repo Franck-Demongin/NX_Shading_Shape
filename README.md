@@ -5,7 +5,7 @@
 
 Blender addon to display shape in the viewport
 
-<img src="https://img.shields.io/badge/Blender-2.8.0-green" /> <img src="https://img.shields.io/badge/Python-3.10-blue" /> <img src="https://img.shields.io/badge/Addon-1.2.0.Stable-orange" /> 
+<img src="https://img.shields.io/badge/Blender-2.8.0-green" /> <img src="https://img.shields.io/badge/Python-3.10-blue" /> <img src="https://img.shields.io/badge/Addon-1.3.0.Stable-orange" /> 
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
 
 ## Installation

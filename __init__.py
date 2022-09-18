@@ -18,7 +18,7 @@
 bl_info = {
     "name": "Shading Shape",
     "author": "Franck Demongin",
-    "version": (1, 2),
+    "version": (1, 3),
     "blender": (2, 80, 0),
     "location": "View3D > Shading",
     "description": "Display shape of the objects",
@@ -55,6 +55,8 @@ class Viewport_OT_shading_shape(bpy.types.Operator):
             context.screen.nx_shading_shape.show_gizmo = space.show_gizmo
             context.screen.nx_shading_shape.view_perspective = space.region_3d.view_perspective
             context.screen.nx_shading_shape.view_matrix = self.flatten(space.region_3d.view_matrix.copy())
+            context.screen.nx_shading_shape.view_xray = space.shading.show_xray
+
 
         area.type = 'VIEW_3D'
 
@@ -70,18 +72,21 @@ class Viewport_OT_shading_shape(bpy.types.Operator):
         space.overlay.show_overlays = False
         space.show_gizmo = False
         space.region_3d.view_perspective = 'CAMERA'
+        space.shading.show_xray = False
+        if context.screen.nx_shading_shape.area_type != 'VIEW_3D':
+            space.show_region_header = False
                 
         return {'FINISHED'}
     
     def reset_area(self, context):    
         area = context.screen.areas[context.screen.nx_shading_shape.area_idx]
-
+        
+        space = area.spaces[0]
         if context.screen.nx_shading_shape.area_type == 'VIEW_3D':
-            space = area.spaces[0]
             space.shading.type = context.screen.nx_shading_shape.shading_type
             space.shading.light = context.screen.nx_shading_shape.shading_light
             space.shading.single_color = context.screen.nx_shading_shape.shading_single_color
-            space.shading.color_type = context.screen.nx_shading_shape.shading_color_type
+            space.shading.color_type = context.screen.nx_shading_shape.shading_color_type if context.screen.nx_shading_shape.shading_color_type != '' else 'SINGLE'
             space.shading.background_color = context.screen.nx_shading_shape.shading_background_color
             space.shading.background_type = context.screen.nx_shading_shape.shading_background_type
             space.show_region_ui = context.screen.nx_shading_shape.show_region_ui
@@ -90,7 +95,29 @@ class Viewport_OT_shading_shape(bpy.types.Operator):
             space.show_gizmo = context.screen.nx_shading_shape.show_gizmo
             space.region_3d.view_perspective = context.screen.nx_shading_shape.view_perspective
             space.region_3d.view_matrix = context.screen.nx_shading_shape.view_matrix
-
+            space.shading.show_xray = context.screen.nx_shading_shape.view_xray
+        else:
+            space.shading.type = 'SOLID'
+            space.shading.light = 'STUDIO'
+            space.shading.single_color = (0.8, 0.8, 0.8)
+            space.shading.color_type = 'MATERIAL'
+            space.shading.background_color = (0.05, 0.05, 0.05)
+            space.shading.background_type = 'THEME'
+            space.show_region_ui = False
+            space.show_region_toolbar = True
+            space.overlay.show_overlays = True
+            space.show_gizmo = True
+            space.region_3d.view_perspective = 'PERSP'
+            space.region_3d.view_matrix = Matrix(
+                (
+                    (0.4100283980369568, 0.9119764566421509, -0.013264661654829979, 0.0),
+                    (-0.4017425775527954, 0.19364342093467712, 0.8950449228286743, 0.0),
+                    (0.8188283443450928, -0.36166495084762573, 0.44577890634536743, -17.986562728881836),
+                    (0.0, 0.0, 0.0, 1.0)
+                )
+            )
+            space.shading.show_xray = context.screen.nx_shading_shape.view_xray
+            space.show_region_header = True
 
         area.type = context.screen.nx_shading_shape.area_type
 
@@ -142,6 +169,7 @@ class MyPropertyGroup(bpy.types.PropertyGroup):
         size=16,
         subtype="MATRIX"
     )
+    view_xray: bpy.props.BoolProperty()
     
 
 bpy.utils.register_class(MyPropertyGroup)
