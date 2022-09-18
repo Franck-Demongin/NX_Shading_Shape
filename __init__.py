@@ -49,7 +49,7 @@ class Viewport_OT_shading_shape(bpy.types.Operator):
         return {'FINISHED'}
 
 def menu_func(self, context):
-    self.layout.operator('viewport.shading_shape', text='Display Shape', icon='SHAPEKEY_DATA')
+    self.layout.operator('viewport.shading_shape', text='Shading Shape', icon='SHAPEKEY_DATA')
 
 def register():
     bpy.utils.register_class(Viewport_OT_shading_shape)
