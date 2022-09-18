@@ -47,6 +47,21 @@ class Viewport_OT_shading_shape(bpy.types.Operator):
         context.region_data.view_perspective = 'CAMERA'
                 
         return {'FINISHED'}
+    
+    def modal(self, context, event):
+        if event.type == 'LEFTMOUSE':  # Confirm
+            print(event)
+            self.execute(context)
+            return {'FINISHED'}
+        elif event.type in {'RIGHTMOUSE', 'ESC'}:  # Cancel
+            context.object.location.x = self.init_loc_x
+            return {'CANCELLED'}
+
+        return {'RUNNING_MODAL'}
+    
+    def invoke(self, context, event):
+        context.window_manager.modal_handler_add(self)
+        return {'RUNNING_MODAL'}
 
 def menu_func(self, context):
     self.layout.operator('viewport.shading_shape', text='Shading Shape', icon='SHAPEKEY_DATA')
