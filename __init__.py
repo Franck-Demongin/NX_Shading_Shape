@@ -26,12 +26,18 @@ bl_info = {
 }
 
 import bpy
+from mathutils import Matrix
 
 class Viewport_OT_shading_shape(bpy.types.Operator):
     """Update viewport shading to see only shape"""
     bl_idname = "viewport.shading_shape"
     bl_label = "Shading Shape"
     
+    def flatten(self, mat):
+        dim = len(mat)
+        return [mat[j][i] for i in range(dim) 
+                        for j in range(dim)]
+
     def execute(self, context):
 
         area = context.screen.areas[context.screen.nx_shading_shape.area_idx]
@@ -48,6 +54,7 @@ class Viewport_OT_shading_shape(bpy.types.Operator):
             context.screen.nx_shading_shape.show_overlays = space.overlay.show_overlays
             context.screen.nx_shading_shape.show_gizmo = space.show_gizmo
             context.screen.nx_shading_shape.view_perspective = space.region_3d.view_perspective
+            context.screen.nx_shading_shape.view_matrix = self.flatten(space.region_3d.view_matrix.copy())
 
         area.type = 'VIEW_3D'
 
@@ -82,6 +89,7 @@ class Viewport_OT_shading_shape(bpy.types.Operator):
             space.overlay.show_overlays = context.screen.nx_shading_shape.show_overlays
             space.show_gizmo = context.screen.nx_shading_shape.show_gizmo
             space.region_3d.view_perspective = context.screen.nx_shading_shape.view_perspective
+            space.region_3d.view_matrix = context.screen.nx_shading_shape.view_matrix
 
 
         area.type = context.screen.nx_shading_shape.area_type
@@ -130,6 +138,10 @@ class MyPropertyGroup(bpy.types.PropertyGroup):
     show_overlays: bpy.props.BoolProperty() 
     show_gizmo: bpy.props.BoolProperty()
     view_perspective: bpy.props.StringProperty()
+    view_matrix: bpy.props.FloatVectorProperty(
+        size=16,
+        subtype="MATRIX"
+    )
     
 
 bpy.utils.register_class(MyPropertyGroup)
