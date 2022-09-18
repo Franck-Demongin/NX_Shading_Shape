@@ -17,6 +17,6 @@ Activate the addon
 
 ## Usage
 
-In View 3D, open Shading tab and select Shading Shape.
+In View 3D, open Shading tab and select Shading Shape. Then click on an area on the Blender's window.
 
 ![UI](https://user-images.githubusercontent.com/54265936/190902270-441dd42c-156c-412b-a4a7-2799525f6521.png)
