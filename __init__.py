@@ -18,7 +18,7 @@
 bl_info = {
     "name": "Shading Shape",
     "author": "Franck Demongin",
-    "version": (1, 0),
+    "version": (1, 1),
     "blender": (2, 80, 0),
     "location": "View3D > Shading",
     "description": "Display shape of the objects",
